@@ -1,0 +1,63 @@
+@import '../../../sass/main.scss';
+.info-bar-container {
+  background-color: $color-main-light-3;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 2rem auto;
+  width: 100%;
+  border-radius: 1rem;
+  padding: 1rem 0rem;
+  font-size: 1.3rem;
+  &__part {
+    margin-right: 1rem;
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    span {
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+  }
+  &__img {
+    width: 4rem;
+    margin-left: 0.5rem;
+    img {
+      width: 100%;
+    }
+  }
+  .info-item-special {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    padding: 0rem 1rem;
+    width: 20rem;
+    border-radius: 0.8rem;
+    margin-bottom: 0.5rem;
+    .info-img {
+      width: 2rem;
+      margin-left: 1rem;
+      padding: 0.2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 0.4rem;
+      img {
+        width: 100%;
+      }
+    }
+    &:hover {
+      background-color: $color-main-light-2;
+      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// media queries
+@media only screen and (max-width: 768px) {
+  .info-bar-container {
+  }
+}

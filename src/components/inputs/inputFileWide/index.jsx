@@ -22,6 +22,7 @@ const InputFileWide = React.memo(() => {
   /******************************************************************/
   const onSubmitHandler = (e) => {
     e.preventDefault();
+    props.onClick(file);
   };
   return (
     <Fragment>

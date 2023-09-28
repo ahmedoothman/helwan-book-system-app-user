@@ -33,10 +33,17 @@
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-    padding: 0rem 1rem;
-    width: 20rem;
+    padding: 1rem;
+    width: 14rem;
     border-radius: 0.8rem;
     margin-bottom: 0.5rem;
+    color: $color-main-dark;
+    p {
+      margin: 0;
+    }
+    &:first-child {
+      color: $color-main-danger;
+    }
     .info-img {
       width: 2rem;
       margin-left: 1rem;

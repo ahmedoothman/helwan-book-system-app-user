@@ -6,7 +6,7 @@ import styles from './index.module.scss';
 import Cookies from 'js-cookie';
 // imgs
 import Person from '../../../assets/icons/male_user.svg';
-import LogOut from '../../../assets/icons/Logout.svg';
+import LogOut from '../../../assets/icons/Logout-R.svg';
 import Key from '../../../assets/icons/key.svg';
 import { useNavigate } from 'react-router-dom';
 /***************************************************************************/

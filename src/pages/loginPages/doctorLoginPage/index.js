@@ -113,7 +113,7 @@ const LoginPage = React.memo(() => {
   };
   return (
     <Fragment>
-      {<NavHeader title={'تسجيل الدخول'} mode={'title'} />}
+      {<NavHeader title={'تسجيل الدخول'} mode={'title'} hideBack={true} />}
       {/* login box */}
       <form className={styles['login-box']} onSubmit={loginHandler}>
         <Input title={'اسم المستخدم'} type='TEXT' ref={userNameRef} />

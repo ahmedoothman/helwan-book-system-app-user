@@ -28,6 +28,9 @@ const DocumentView = React.lazy(() =>
   import('./pages/course/documentView/index')
 );
 // settings pages
+const ChangePassword = React.lazy(() =>
+  import('./pages/settings/changePassword/index')
+);
 // cookies
 function App() {
   // get role from redux
@@ -57,6 +60,7 @@ function App() {
           {/* **************************************** */}
           {/* settings Routes */}
           {/* **************************************** */}
+          <Route path='/settings/changePassword' element={<ChangePassword />} />
           {/* **************************************** */}
           {/* notFound */}
           {/* **************************************** */}

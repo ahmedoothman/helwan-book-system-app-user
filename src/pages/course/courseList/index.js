@@ -63,28 +63,28 @@ const CourseList = React.memo(() => {
           <CourseFolder
             onClick={navigateSubList}
             info={{
-              courseCode: 'C-124344',
+              courseCode: 'CS-101',
               courseName: 'معالجة الاشارات الرقمية',
             }}
           />
           <CourseFolder
             onClick={navigateSubList}
             info={{
-              courseCode: 'C-124344',
+              courseCode: 'CS-101',
               courseName: 'معالجة الاشارات الرقمية',
             }}
           />
           <CourseFolder
             onClick={navigateSubList}
             info={{
-              courseCode: 'C-124344',
+              courseCode: 'CS-101',
               courseName: 'معالجة الاشارات الرقمية',
             }}
           />
           <CourseFolder
             onClick={navigateSubList}
             info={{
-              courseCode: 'C-124344',
+              courseCode: 'CS-101',
               courseName: 'معالجة الاشارات الرقمية',
             }}
           />

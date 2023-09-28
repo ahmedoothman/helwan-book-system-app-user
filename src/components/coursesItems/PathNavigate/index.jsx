@@ -26,12 +26,11 @@ const PathNavigate = React.memo((props) => {
           {props.course && (
             <Fragment>
               <div className={styles['info-item']}>
-                <span>المقرر </span>
-                {props.course.name}
+                <span>{props.course.name} </span>
               </div>
               <div className={styles['info-item']}>
                 {' '}
-                <span>كود المقرر </span> {props.course.code}
+                <span>{props.course.code}</span>
               </div>
             </Fragment>
           )}

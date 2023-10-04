@@ -22,7 +22,11 @@ const InputFileWide = React.memo((props) => {
   /******************************************************************/
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    props.onClick(file);
+    // build new file with encoded name
+    const newFile = new File([file], encodeURIComponent(file.name), {
+      type: file.type,
+    });
+    props.onClick(newFile);
   };
   return (
     <Fragment>

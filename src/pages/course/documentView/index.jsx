@@ -36,7 +36,7 @@ const DocumentView = React.memo(() => {
     useSelector((state) => state.ui.api_url)
   );
   const [pdfUrl, setPdfUrl] = useState(
-    `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}}`
+    `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}`
   );
   const [role, setRole] = useState('NOT');
   // reducer

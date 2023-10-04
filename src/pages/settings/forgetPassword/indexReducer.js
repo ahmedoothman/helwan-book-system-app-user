@@ -1,11 +1,10 @@
-export const courseContentStatesInitialState = {
+export const forgetPasswordStatesInitialState = {
   success: false,
   error: false,
   errorMessage: '',
   pending: false,
 };
-
-export const courseContentStatesReducer = (state, action) => {
+export const forgetPasswordStatesReducer = (state, action) => {
   if (action.type === 'SUCCESS') {
     return {
       ...state,
@@ -42,5 +41,5 @@ export const courseContentStatesReducer = (state, action) => {
       error: false,
     };
   }
-  return courseContentStatesReducer;
+  return forgetPasswordStatesInitialState;
 };

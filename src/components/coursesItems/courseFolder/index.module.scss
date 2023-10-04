@@ -32,6 +32,14 @@
     font-size: 1.3rem;
     font-weight: bold;
   }
+  &__trails {
+    position: absolute;
+    background-color: $color-secondary-dark;
+    color: $color-main-light-3;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    top: 7rem;
+  }
 }
 .folder:hover {
   background-color: $color-main-light-3;

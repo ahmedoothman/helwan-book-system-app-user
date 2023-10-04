@@ -1,11 +1,11 @@
 // react
-import React, { Fragment, useEffect, useReducer, useRef } from 'react';
+import React, { Fragment, useEffect, useReducer, useState } from 'react';
 
 // styles
 import styles from './index.module.scss';
 // components
 import { CourseFolder } from '../../../components/coursesItems/courseFolder';
-import { InfoBar } from '../../../components/coursesItems/infoBar';
+import { InfoBar } from '../../../components/infoBar';
 import { NavHeader } from '../../../components/navHeader';
 import { MainContainer } from '../../../components/mainContainer';
 import { PathNavigate } from '../../../components/coursesItems/PathNavigate';
@@ -20,17 +20,26 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 // router
 import { useNavigate, useParams } from 'react-router-dom';
-// redux
-import { useDispatch } from 'react-redux';
-
+// services
+import {
+  getRoleService,
+  getMatrialServices,
+  getMatrialCounts,
+} from '../../../services/userService';
 /***************************************************************************/
 /* Name : CourseSubList React Component */
 /***************************************************************************/
 const CourseSubList = React.memo(() => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // role
+  const [role, setRole] = useState('NOT');
   // params
   const { name, code } = useParams();
+  // states
+  const [booksNumber, setBooksNumber] = useState('0');
+  const [slidesNumber, setSlidesNumber] = useState('0');
+  const [sheetsNumber, setSheetsNumber] = useState('0');
+  const [othersNumber, setOthersNumber] = useState('0');
   // reducer
   const [courseSubListStates, dispatchCourseSubListStates] = useReducer(
     courseSubListStatesReducer,
@@ -40,8 +49,35 @@ const CourseSubList = React.memo(() => {
   /* useEffect */
   /******************************************************************/
   useEffect(() => {
-    (async () => {})();
+    (async () => {
+      const { role } = await getRoleService();
+      setRole(role);
+      // get number of files
+      await calculateNumberOfFiles(role);
+    })();
   }, []);
+  /******************************************************************/
+  /* calculate number of files */
+  /******************************************************************/
+  const calculateNumberOfFiles = async (roleA) => {
+    // dispatch pending
+    dispatchCourseSubListStates({ type: 'PENDING' });
+    const response = await getMatrialCounts(code);
+    if (response.status === 'success') {
+      // to do change the api function anf get the numbers
+      setBooksNumber(response.data.Books.noOfFile + '');
+      setSlidesNumber(response.data.Slides.noOfFile + '');
+      setSheetsNumber(response.data.Sheets.noOfFile + '');
+      setOthersNumber(response.data.Others.noOfFile + '');
+      // dispatch clear
+      dispatchCourseSubListStates({ type: 'CLEAR' });
+    } else {
+      dispatchCourseSubListStates({
+        type: 'ERROR',
+        errorMessage: response.message,
+      });
+    }
+  };
   /******************************************************************/
   /* handleCloseSnackbar */
   /******************************************************************/
@@ -58,15 +94,7 @@ const CourseSubList = React.memo(() => {
     <Fragment>
       <NavHeader title={'المقررات الدراسية'} />
       <MainContainer>
-        <InfoBar
-          info={{
-            name: 'احمد عثمان علي',
-            role: 'STUDENT',
-            faculty: 'الحاسبات والمعلومات',
-            department: 'علوم الحاسب',
-            level: 'الفرقة الثانية',
-          }}
-        />
+        <InfoBar />
         <PathNavigate course={{ name, code }} slugs={[]} />
         <div className={styles['courses-container']}>
           <CourseFolder
@@ -74,6 +102,7 @@ const CourseSubList = React.memo(() => {
             info={{
               courseCode: '',
               courseName: 'Books',
+              noOfFiles: booksNumber,
             }}
           />
           <CourseFolder
@@ -81,6 +110,7 @@ const CourseSubList = React.memo(() => {
             info={{
               courseCode: '',
               courseName: 'Slides',
+              noOfFiles: slidesNumber,
             }}
           />
           <CourseFolder
@@ -88,6 +118,7 @@ const CourseSubList = React.memo(() => {
             info={{
               courseCode: '',
               courseName: 'Sheets',
+              noOfFiles: sheetsNumber,
             }}
           />
           <CourseFolder
@@ -95,6 +126,7 @@ const CourseSubList = React.memo(() => {
             info={{
               courseCode: '',
               courseName: 'Others',
+              noOfFiles: othersNumber,
             }}
           />
         </div>

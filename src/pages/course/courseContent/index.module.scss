@@ -28,6 +28,9 @@
         padding: 1rem;
         font-size: 1.3rem;
         text-align: center;
+        p {
+          margin: 0;
+        }
         &:last-child {
           img {
             cursor: pointer;

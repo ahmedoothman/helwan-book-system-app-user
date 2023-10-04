@@ -27,7 +27,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 // router
 import { useNavigate } from 'react-router-dom';
 // services
-import { changePasswordService } from '../../../services/settingsServicce';
+import { changePasswordService } from '../../../services/userService';
 
 /***************************************************************************/
 /* Name : ChangePassword React Component */
@@ -124,13 +124,14 @@ const ChangePassword = React.memo(() => {
     const passwordConfirm = passwordConfirmRef.current.getInputValue();
 
     // validate input
+    const data = {
+      passwordCurrent,
+      password,
+      passwordConfirm,
+    };
     const isValid = validateInput(passwordCurrent, password, passwordConfirm);
     if (isValid) {
-      const response = await changePasswordService(
-        passwordCurrent,
-        password,
-        passwordConfirm
-      );
+      const response = await changePasswordService(data);
       if (response.status === 'success') {
         // dispatch states
         dispatchChangePasswordStates({
@@ -139,7 +140,7 @@ const ChangePassword = React.memo(() => {
         });
         // navigate to dashboard
         setTimeout(() => {
-          navigate('/');
+          navigate('/doctor/login');
         }, 1000);
       } else {
         // dispatch states

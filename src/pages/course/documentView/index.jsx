@@ -19,16 +19,26 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 // router
 import { useNavigate } from 'react-router-dom';
+// react redux
+import { useSelector } from 'react-redux';
+// libs
+import Cookies from 'js-cookie';
 // services
-// import { apiServices } from '../../../services/apiServices';
-// pdf
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+import { getRoleService } from '../../../services/userService';
 /***************************************************************************/
 /* Name : DocumentView React Component */
 /***************************************************************************/
 const DocumentView = React.memo(() => {
-  const { name, code, type, itemId } = useParams();
   const navigate = useNavigate();
+  const { name, code, type, itemId } = useParams();
+  const token = Cookies.get('token');
+  const [apiUrl, setApiUrl] = useState(
+    useSelector((state) => state.ui.api_url)
+  );
+  const [pdfUrl, setPdfUrl] = useState(
+    `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}}`
+  );
+  const [role, setRole] = useState('NOT');
   // reducer
   const [documentViewStates, dispatchDocumentViewStates] = useReducer(
     documentViewStatesReducer,
@@ -39,7 +49,15 @@ const DocumentView = React.memo(() => {
   /* useEffect */
   /******************************************************************/
   useEffect(() => {
-    (async () => {})();
+    (async () => {
+      const { role } = await getRoleService();
+      setRole(role);
+      if (role === 'STUDENT') {
+        setPdfUrl(
+          `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}`
+        );
+      }
+    })();
   }, []);
   /******************************************************************/
   /* handleCloseSnackbar */
@@ -60,11 +78,11 @@ const DocumentView = React.memo(() => {
           }}
         >
           <embed
-            src={'https://www.orimi.com/pdf-test.pdf'}
+            src={pdfUrl}
             width='100%'
             height='1000'
+            crossOrigin='anonymous'
           />
-          {/* <PDFViewer url={'https://www.orimi.com/pdf-test.pdf'} /> */}
         </div>
       </MainContainer>
       {/* ********** SUCCESS SNACKBAR ********** */}

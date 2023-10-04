@@ -1,10 +1,10 @@
-export const courseSubListStatesReducer = {
+export const courseSubListStatesInitialState = {
   success: false,
   error: false,
   errorMessage: '',
   pending: false,
 };
-export const courseSubListStatesInitialState = (state, action) => {
+export const courseSubListStatesReducer = (state, action) => {
   if (action.type === 'SUCCESS') {
     return {
       ...state,
@@ -41,5 +41,5 @@ export const courseSubListStatesInitialState = (state, action) => {
       error: false,
     };
   }
-  return courseSubListStatesReducer;
+  return courseSubListStatesInitialState;
 };

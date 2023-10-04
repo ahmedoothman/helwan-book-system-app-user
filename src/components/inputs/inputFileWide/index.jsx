@@ -7,7 +7,7 @@ import { BtnSmall } from '../../btns/btnSmall';
 /***************************************************************************/
 /* Name : InputFileWide React Component */
 /***************************************************************************/
-const InputFileWide = React.memo(() => {
+const InputFileWide = React.memo((props) => {
   // file
   const [file, setFile] = useState(null);
   /******************************************************************/

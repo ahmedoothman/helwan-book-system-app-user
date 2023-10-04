@@ -1,12 +1,15 @@
 // react
-import React, { Fragment, useEffect, useReducer, useRef } from 'react';
+import React, { Fragment, useEffect, useReducer, useState } from 'react';
 // styles
 import styles from './index.module.scss';
 // components
 import { CourseFolder } from '../../../components/coursesItems/courseFolder';
-import { InfoBar } from '../../../components/coursesItems/infoBar';
+import { InfoBar } from '../../../components/infoBar';
 import { NavHeader } from '../../../components/navHeader';
 import { MainContainer } from '../../../components/mainContainer';
+import { Message } from '../../../components/message';
+// libs
+import Cookies from 'js-cookie';
 // reducer
 import {
   coursesListStatesInitialState,
@@ -17,6 +20,12 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 // router
 import { useNavigate } from 'react-router-dom';
+// services
+import {
+  getRoleService,
+  studentLoginService,
+  getCoursesDoctorService,
+} from '../../../services/userService';
 
 /***************************************************************************/
 /* Name : CourseList React Component */
@@ -28,12 +37,62 @@ const CourseList = React.memo(() => {
     coursesListStatesReducer,
     coursesListStatesInitialState
   );
+  const [courses, setCourses] = useState([]);
+  const [role, setRole] = useState('NOT');
   /******************************************************************/
   /* useEffect */
   /******************************************************************/
   useEffect(() => {
-    (async () => {})();
+    (async () => {
+      const { role } = await getRoleService();
+      setRole(role);
+      if (role === 'STUDENT') {
+        await getCoursesHandler();
+      }
+      if (role === 'DOCTOR') {
+        await getCoursesDoctorHandler();
+      }
+      // get courses
+    })();
   }, []);
+  /******************************************************************/
+  /* getCoursesHandler */
+  /******************************************************************/
+  const getCoursesHandler = async () => {
+    const nationalID = Cookies.get('nationalID');
+    const studentID = Cookies.get('studentID');
+    if (!nationalID && !studentID) {
+      navigate('/');
+      return;
+    }
+    const response = await studentLoginService(studentID, nationalID);
+    if (response.status === 'success') {
+      // get courses
+      setCourses(response.courses);
+    } else {
+      dispatchCourseListStates({
+        type: 'ERROR',
+        errorMessage: response.message,
+      });
+    }
+  };
+  /******************************************************************/
+  /* getCoursesDoctorHandler */
+  /******************************************************************/
+  const getCoursesDoctorHandler = async () => {
+    const response = await getCoursesDoctorService();
+    dispatchCourseListStates({ type: 'PENDING' });
+    if (response.status === 'success') {
+      // get courses
+      setCourses(response.courses);
+      dispatchCourseListStates({ type: 'CLEAR' });
+    } else {
+      dispatchCourseListStates({
+        type: 'ERROR',
+        errorMessage: response.message,
+      });
+    }
+  };
   /******************************************************************/
   /* handleCloseSnackbar */
   /******************************************************************/
@@ -50,44 +109,19 @@ const CourseList = React.memo(() => {
     <Fragment>
       <NavHeader title={'المقررات الدراسية'} />
       <MainContainer>
-        <InfoBar
-          info={{
-            name: 'احمد عثمان علي',
-            role: 'STUDENT',
-            faculty: 'الحاسبات والمعلومات',
-            department: 'علوم الحاسب',
-            level: 'الفرقة الثانية',
-          }}
-        />
+        <InfoBar />
         <div className={styles['courses-container']}>
-          <CourseFolder
-            onClick={navigateSubList}
-            info={{
-              courseCode: 'CS-101',
-              courseName: 'معالجة الاشارات الرقمية',
-            }}
-          />
-          <CourseFolder
-            onClick={navigateSubList}
-            info={{
-              courseCode: 'CS-101',
-              courseName: 'معالجة الاشارات الرقمية',
-            }}
-          />
-          <CourseFolder
-            onClick={navigateSubList}
-            info={{
-              courseCode: 'CS-101',
-              courseName: 'معالجة الاشارات الرقمية',
-            }}
-          />
-          <CourseFolder
-            onClick={navigateSubList}
-            info={{
-              courseCode: 'CS-101',
-              courseName: 'معالجة الاشارات الرقمية',
-            }}
-          />
+          {courses.length > 0 &&
+            courses.map((course) => (
+              <CourseFolder
+                onClick={navigateSubList}
+                info={course}
+                key={course.courseCode}
+              />
+            ))}
+          {courses.length === 0 && (
+            <Message type='info' text='لا يوجد مقررات دراسية' />
+          )}
         </div>
       </MainContainer>
 

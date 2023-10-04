@@ -22,14 +22,14 @@ import CircularProgress from '@mui/material/CircularProgress';
 // router
 import { useNavigate } from 'react-router-dom';
 // services
-import { loginRequest } from '../../../services/adminService';
+import { doctorLoginService } from '../../../services/userService';
 /***************************************************************************/
 /* Name : LoginPage React Component */
 /***************************************************************************/
 const LoginPage = React.memo(() => {
   const navigate = useNavigate();
   // refs
-  const userNameRef = useRef(null);
+  const emailRef = useRef(null);
   const passwordRef = useRef(null);
   // reducer
   const [loginPageStates, dispatchLoginPageStates] = useReducer(
@@ -39,10 +39,10 @@ const LoginPage = React.memo(() => {
   /******************************************************************/
   /* validate input */
   /******************************************************************/
-  const validateInput = (userName, password) => {
+  const validateInput = (email, password) => {
     // validate
-    if (userName.trim() === '') {
-      userNameRef.current.activeError();
+    if (email.trim() === '') {
+      emailRef.current.activeError();
       // dispatch states
       dispatchLoginPageStates({
         type: 'ERROR',
@@ -50,7 +50,7 @@ const LoginPage = React.memo(() => {
       });
       return false;
     } else {
-      userNameRef.current.clearError();
+      emailRef.current.clearError();
     }
 
     if (password.trim() === '') {
@@ -72,30 +72,26 @@ const LoginPage = React.memo(() => {
   const loginHandler = async (e) => {
     // prevent default
     e.preventDefault();
-    // get values
-    const userName = userNameRef.current.getInputValue();
-    const password = passwordRef.current.getInputValue();
     // validate
-    const isValid = validateInput(userName, password);
-    if (!isValid) {
-      return;
-    }
+    const email = emailRef.current.getInputValue();
+    const password = passwordRef.current.getInputValue();
+    const isValid = validateInput(email, password);
+    if (!isValid) return;
     // dispatch states
     dispatchLoginPageStates({ type: 'PENDING' });
-    // calling login request
-    const response = await loginRequest(userName, password);
+    // login
+    const response = await doctorLoginService(email, password);
     if (response.status === 'success') {
-      // dispatch states
-      dispatchLoginPageStates({ type: 'SUCCESS' });
-      if (response.user.passwordChanged === true) {
-        // redirect to dashboard
-        navigate('/admin/studentsInfo');
+      if (response.user.passwordChanged === false) {
+        // redirect to change password page
+        navigate('/settings/changePassword');
       } else {
-        // redirect to change password
-        navigate('/admin/changePassword');
+        // redirect to home page
+        navigate('/course/courses');
       }
+
+      dispatchLoginPageStates({ type: 'CLEAR' });
     } else {
-      // dispatch states
       dispatchLoginPageStates({
         type: 'ERROR',
         errorMessage: response.message,
@@ -118,9 +114,16 @@ const LoginPage = React.memo(() => {
       {/* login box */}
       <MainContainer>
         <form className={styles['login-box']} onSubmit={loginHandler}>
-          <Input title={'اسم المستخدم'} type='TEXT' ref={userNameRef} />
+          <Input title={'الايميل'} type='TEXT' ref={emailRef} />
           <Input title={'كلمة السر'} type='PASSWORD' ref={passwordRef} />
-          <br />
+          <p
+            onClick={() => {
+              navigate('/settings/forgetPassword');
+            }}
+          >
+            هل نسيت كلمة السر؟
+          </p>
+
           {loginPageStates.pending && (
             <BtnSmall
               title={

@@ -93,20 +93,7 @@ const LoginStudentPage = React.memo(() => {
     if (response.status === 'success') {
       // dispatch states
       dispatchLoginPageStates({ type: 'SUCCESS' });
-      // set the data to redux
-      dispatch(uiActions.setStudentData(response.user.result));
-      // set the id to redux
-      dispatch(uiActions.setStudentID(response.user._id));
-      // set the student object
-      dispatch(uiActions.setStudentObj(response.user.studentData));
-      const isPassed = response.user.studentData.isPassed;
-      if (!isPassed) {
-        // navigate to dashboard
-        navigate('/dashboard/documentDownloadPage');
-      } else {
-        // navigate to dashboard
-        navigate('/dashboard/studentDataView');
-      }
+      navigate('/course/courses');
     } else {
       // dispatch states
       dispatchLoginPageStates({
@@ -131,8 +118,8 @@ const LoginStudentPage = React.memo(() => {
       {/* login box */}
       <MainContainer>
         <form className={styles['login-box']} onSubmit={getStudentDataHandler}>
-          <Input title={'رقم الجلوس'} type='TEXT' ref={studentIdRef} />
-          <Input title={'الرقم القومي'} type='TEXT' ref={nationalIDRef} />
+          <Input title={'الرقم التعريفي '} type='TEXT' ref={studentIdRef} />
+          <Input title={'كلمة السر'} type='PASSWORD' ref={nationalIDRef} />
           <br />
           {loginPageStates.pending && (
             <BtnSmall

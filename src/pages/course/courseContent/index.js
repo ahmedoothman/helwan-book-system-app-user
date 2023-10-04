@@ -4,12 +4,13 @@ import React, { Fragment, useEffect, useReducer, useState } from 'react';
 // styles
 import styles from './index.module.scss';
 // components
-import { InfoBar } from '../../../components/coursesItems/infoBar';
+import { InfoBar } from '../../../components/infoBar';
 import { NavHeader } from '../../../components/navHeader';
 import { InputFileWide } from '../../../components/inputs/inputFileWide';
 import { FormPopUp } from '../../../components/formPopUp';
 import { MainContainer } from '../../../components/mainContainer';
 import { PathNavigate } from '../../../components/coursesItems/PathNavigate';
+import { Message } from '../../../components/message';
 // reducer
 import {
   courseContentStatesReducer,
@@ -24,7 +25,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 // icons
 import Eye from '../../../assets/icons/eye.svg';
 import Delete from '../../../assets/icons/Delete.svg';
-import { upload } from '@testing-library/user-event/dist/upload';
+// libs formdata
+import FormData from 'form-data';
+// services
+import {
+  getRoleService,
+  getMatrialServices,
+  uploadMatrialServices,
+  deleteMatrialServices,
+} from '../../../services/userService';
 /***************************************************************************/
 /* Name : CourseContent React Component */
 /***************************************************************************/
@@ -32,13 +41,13 @@ const CourseContent = React.memo(() => {
   const navigate = useNavigate();
   // params
   const { name, code, type } = useParams();
-  const [role, setRole] = useState('DOCTOR');
+  const [role, setRole] = useState('NOT');
   // confirm delete state
   const [confirmDeleteForm, setConfirmDeleteForm] = useState(false);
   // item name
   const [itemName, setItemName] = useState('ملف');
-  // file
-  const [file, setFile] = useState(null);
+  // files
+  const [files, setFiles] = useState([]);
   // reducer
   const [courseContentStates, dispatchCourseContentStates] = useReducer(
     courseContentStatesReducer,
@@ -48,7 +57,13 @@ const CourseContent = React.memo(() => {
   /* useEffect */
   /******************************************************************/
   useEffect(() => {
-    (async () => {})();
+    (async () => {
+      // get Role
+      const { role: roleD } = await getRoleService();
+      setRole(roleD);
+      // get material
+      await getMatrialHandler(roleD);
+    })();
   }, []);
   // close confirm delete form
   const handleCloseConfirmForm = () => {
@@ -61,10 +76,37 @@ const CourseContent = React.memo(() => {
     dispatchCourseContentStates({ type: 'CLEAR' });
   };
   /******************************************************************/
+  /* getMatrialHandler */
+  /******************************************************************/
+  const getMatrialHandler = async (roleA) => {
+    // dispatch pending
+    dispatchCourseContentStates({ type: 'PENDING' });
+    const response = await getMatrialServices(code, type);
+    if (response.status === 'success') {
+      // get courses
+      // check roleA
+      if (type === 'Books') {
+        if (roleA === 'DOCTOR') {
+          setFiles(response.bookStatus);
+        } else {
+          setFiles(response.data);
+        }
+      } else {
+        setFiles(response.data);
+      }
+      // dispatch clear
+      dispatchCourseContentStates({ type: 'CLEAR' });
+    } else {
+      dispatchCourseContentStates({
+        type: 'ERROR',
+        errorMessage: response.message,
+      });
+    }
+  };
+  /******************************************************************/
   /* view */
   /******************************************************************/
   const viewHandler = (itemId) => {
-    // api call to get pdf
     // navigate to pdf view page
     navigate(`/course/${name}/${code}/${type}/${itemId}`);
   };
@@ -80,60 +122,158 @@ const CourseContent = React.memo(() => {
   /******************************************************************/
   /* deleteCouserItemHandler */
   /******************************************************************/
-  const deleteCouserItemHandler = () => {
-    // api call
+  const deleteCouserItemHandler = async () => {
+    dispatchCourseContentStates({ type: 'PENDING' });
+    const response = await deleteMatrialServices(code, type, itemName);
+
+    if (response.status === 'success') {
+      // get material
+      await getMatrialHandler(role);
+      // dispatch states
+      dispatchCourseContentStates({
+        type: 'SUCCESS',
+        successMessage: 'تم مسح الملف بنجاح',
+      });
+      // close confirm delete form
+      setConfirmDeleteForm(false);
+    } else {
+      dispatchCourseContentStates({
+        type: 'ERROR',
+        errorMessage: response.message,
+      });
+    }
   };
   /******************************************************************/
   /* uploadFileHandler */
   /******************************************************************/
-  const uploadFileHandler = (file) => {
-    // open file input
+  const uploadFileHandler = async (file) => {
+    dispatchCourseContentStates({ type: 'PENDING' });
+    if (file === null) {
+      dispatchCourseContentStates({
+        type: 'ERROR',
+        errorMessage: 'يجب اختيار ملف',
+      });
+      return;
+    }
+    // create form data
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('courseCode', code);
+    formData.append('materialType', type);
+    // api call
+    const response = await uploadMatrialServices(formData);
+    if (response.status == 'success') {
+      dispatchCourseContentStates({
+        type: 'SUCCESS',
+        successMessage: 'تم تحميل الملف بنجاح',
+      });
+      // get material
+      await getMatrialHandler(role);
+    } else {
+      dispatchCourseContentStates({
+        type: 'ERROR',
+        errorMessage: response.message,
+      });
+    }
   };
   return (
     <Fragment>
       <NavHeader title={'المقررات الدراسية'} />
       <MainContainer>
-        <InfoBar
-          info={{
-            name: 'احمد عثمان علي',
-            role: 'STUDENT',
-            faculty: 'الحاسبات والمعلومات',
-            department: 'علوم الحاسب',
-            level: 'الفرقة الثانية',
-          }}
-        />
+        <InfoBar />
         <PathNavigate course={{ name, code }} slugs={[type]} />
-        {role === 'DOCTOR' && <InputFileWide onClick={uploadFileHandler} />}
+        {role === 'DOCTOR' && role !== 'NOT' && (
+          <InputFileWide onClick={uploadFileHandler} />
+        )}
         <div className={styles['list-container']}>
-          <table className={styles['table']}>
-            <tr>
-              <th>الاسم</th>
-              <th>الحجم</th>
-              {role === 'DOCTOR' && <th>الحالة</th>}
-              <th>:</th>
-            </tr>
-            <tr>
-              <td>محاضرة 1</td>
-              <td>1.5 MB</td>
-              {role === 'DOCTOR' && <td>تمت الموافقة 🟢</td>}
-              <td>
-                <img
-                  src={Eye}
-                  onClick={() => {
-                    viewHandler('33');
-                  }}
-                />
-                {role === 'DOCTOR' && (
-                  <img
-                    src={Delete}
-                    onClick={() => {
-                      deleteHandler('محاضرة s');
-                    }}
-                  />
-                )}
-              </td>
-            </tr>
-          </table>
+          {files.length !== 0 && !courseContentStates.pending && (
+            <table className={styles['table']}>
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  {role === 'DOCTOR' && role !== 'NOT' && type === 'Books' && (
+                    <th>الحالة</th>
+                  )}
+                  <th>:</th>
+                </tr>
+              </thead>
+              <tbody>
+                {files.map((file) => {
+                  return (
+                    <tr key={file.materialName}>
+                      <td>{file.materialName}</td>
+                      {role === 'DOCTOR' &&
+                        role !== 'NOT' &&
+                        type === 'Books' && (
+                          <td>
+                            {file.publisherStatus === 'accepted' &&
+                              file.adminStatus === 'accepted' && (
+                                <p>🟢 تم قبول الكتاب </p>
+                              )}
+                            {file.publisherStatus === 'accepted' &&
+                              file.adminStatus !== 'accepted' && (
+                                <p>🟢 تم قبول الكتاب من هيئة النشر </p>
+                              )}
+                            {file.publisherStatus !== 'accepted' &&
+                              file.adminStatus === 'accepted' && (
+                                <p>🟢 تم قبول الكتاب من مسؤول الكلية </p>
+                              )}
+                            {file.publisherStatus === 'pending' &&
+                              file.adminStatus === 'pending' && (
+                                <p>🟡 جاري مراجعة الكتاب </p>
+                              )}
+                            {file.publisherStatus === 'pending' &&
+                              file.adminStatus !== 'pending' && (
+                                <p>🟡 جاري مراجعة الكتاب من هيئة النشر </p>
+                              )}
+                            {file.publisherStatus !== 'pending' &&
+                              file.adminStatus === 'pending' && (
+                                <p>🟡جاري مراجعة الكتاب من مسؤول الكلية </p>
+                              )}
+                            {file.publisherStatus === 'rejected' &&
+                              file.adminStatus === 'rejected' && (
+                                <p>
+                                  🔴تم رفض الكتاب من هيئة النشر و مسؤول الكلية
+                                </p>
+                              )}
+
+                            {file.publisherStatus === 'rejected' &&
+                              file.adminStatus !== 'rejected' && (
+                                <p> 🔴تم رفض الكتاب من هيئة النشر</p>
+                              )}
+
+                            {file.publisherStatus !== 'rejected' &&
+                              file.adminStatus === 'rejected' && (
+                                <p>🔴تم رفض الكتاب من مسؤول الكلية</p>
+                              )}
+                          </td>
+                        )}
+                      <td>
+                        <img
+                          src={Eye}
+                          onClick={() => {
+                            viewHandler(file.materialName);
+                          }}
+                        />
+                        {role === 'DOCTOR' && role !== 'NOT' && (
+                          <img
+                            src={Delete}
+                            onClick={() => {
+                              deleteHandler(file.materialName);
+                            }}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+          {files.length === 0 && <Message text={'لا يوجد ملفات'} />}
+          {courseContentStates.pending && (
+            <Message text={'يتم تحميل الملفات'} type='load' />
+          )}
         </div>
       </MainContainer>{' '}
       {/* ********** open Confirmation Form  confirmDeleteForm ********** */}

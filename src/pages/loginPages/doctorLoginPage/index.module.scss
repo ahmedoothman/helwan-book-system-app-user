@@ -7,4 +7,16 @@
   justify-content: center;
   width: 100%;
   height: 70vh;
+  p {
+    font-size: 1.2rem;
+    margin: 0.5rem;
+    color: $color-main-dark;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 0.1rem solid transparent;
+    &:hover {
+      cursor: pointer;
+      color: $color-secondary-dark;
+      border-bottom: 0.1rem solid $color-secondary-dark;
+    }
+  }
 }

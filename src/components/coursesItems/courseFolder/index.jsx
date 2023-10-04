@@ -19,7 +19,7 @@ const CourseFolder = React.memo((props) => {
   /* onClickHandler */
   /******************************************************************/
   const onClickHandler = () => {
-    props.onClick(props.info.courseName, props.info.courseCode );
+    props.onClick(props.info.courseName, props.info.courseCode);
   };
   return (
     <Fragment>
@@ -27,6 +27,11 @@ const CourseFolder = React.memo((props) => {
         <div className={styles['folder__img']}>
           <img src={Folder} alt='folder' />
         </div>
+        {props.info.noOfFiles && props.info.noOfFiles !== '' && (
+          <div className={styles['folder__trails']}>
+            {props.info.noOfFiles} ملف
+          </div>
+        )}
         <div className={styles['folder__code']}>{props.info.courseCode}</div>
         <div className={styles['folder__name']}>{props.info.courseName}</div>
       </div>

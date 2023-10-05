@@ -19,12 +19,14 @@ import {
 // MUI
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
+// react redux
+import { useSelector } from 'react-redux';
 // router
 import { useNavigate, useParams } from 'react-router-dom';
 // icons
 import Eye from '../../../assets/icons/eye.svg';
 import Delete from '../../../assets/icons/Delete.svg';
+import Download from '../../../assets/icons/download.svg';
 // libs formdata
 import FormData from 'form-data';
 // services
@@ -46,6 +48,11 @@ const CourseContent = React.memo(() => {
   const [confirmDeleteForm, setConfirmDeleteForm] = useState(false);
   // item name
   const [itemName, setItemName] = useState('ملف');
+  // apiUrl state
+  const [apiUrl, setApiUrl] = useState(
+    useSelector((state) => state.ui.api_url)
+  );
+
   // files
   const [files, setFiles] = useState([]);
   // reducer
@@ -109,6 +116,16 @@ const CourseContent = React.memo(() => {
   const viewHandler = (itemId) => {
     // navigate to pdf view page
     navigate(`/course/${name}/${code}/${type}/${itemId}`);
+  };
+  /******************************************************************/
+  /* download */
+  /******************************************************************/
+  const downloadHandler = (itemId) => {
+    // the same but download
+    const a = document.createElement('a');
+    a.href = `${apiUrl}/materials/${code}/${type}/${itemId}`;
+    a.download = `${itemId}`;
+    a.click();
   };
   /******************************************************************/
   /* delete */
@@ -249,12 +266,24 @@ const CourseContent = React.memo(() => {
                           </td>
                         )}
                       <td>
-                        <img
-                          src={Eye}
-                          onClick={() => {
-                            viewHandler(file.materialName);
-                          }}
-                        />
+                        {(type === 'Books' ||
+                          file.materialName.includes('pdf')) && (
+                          <img
+                            src={Eye}
+                            onClick={() => {
+                              viewHandler(file.materialName);
+                            }}
+                          />
+                        )}
+                        {type !== 'Books' &&
+                          !file.materialName.includes('pdf') && (
+                            <img
+                              src={Download}
+                              onClick={() => {
+                                downloadHandler(file.materialName);
+                              }}
+                            />
+                          )}
                         {role === 'DOCTOR' && role !== 'NOT' && (
                           <img
                             src={Delete}

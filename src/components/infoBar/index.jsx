@@ -10,7 +10,11 @@ import LogOut from '../../assets/icons/Logout-R.svg';
 import Key from '../../assets/icons/key.svg';
 import { useNavigate } from 'react-router-dom';
 // services
-import { getRoleService, getMeService } from '../../services/userService';
+import {
+  getRoleService,
+  getMeService,
+  LogOutService,
+} from '../../services/userService';
 /***************************************************************************/
 /* Name : InfoBar React Component */
 /***************************************************************************/
@@ -35,7 +39,7 @@ const InfoBar = React.memo(() => {
   /******************************************************************/
   /* logOutHandler */
   /******************************************************************/
-  const logOutHandler = () => {
+  const logOutHandler = async () => {
     // remove session
     Cookies.remove('token');
     Cookies.remove('csrftoken');
@@ -44,7 +48,10 @@ const InfoBar = React.memo(() => {
 
     // redirect to login page
     if (role === 'STUDENT') {
-      navigate('/');
+      const response = await LogOutService();
+      if (response.status === 'success') {
+        navigate('/');
+      }
     } else {
       navigate('/doctor/login');
     }

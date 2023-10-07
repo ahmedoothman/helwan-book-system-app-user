@@ -27,8 +27,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Eye from '../../../assets/icons/eye.svg';
 import Delete from '../../../assets/icons/Delete.svg';
 import Download from '../../../assets/icons/download.svg';
-// libs formdata
+// libs
 import FormData from 'form-data';
+import Cookies from 'js-cookie';
 // services
 import {
   getRoleService,
@@ -121,11 +122,10 @@ const CourseContent = React.memo(() => {
   /* download */
   /******************************************************************/
   const downloadHandler = (itemId) => {
+    const token = Cookies.get('token');
+    const downloadUrl = `${apiUrl}/api/v1/material/getMaterial/${code}/${type}/${token}/${itemId}`;
     // the same but download
-    const a = document.createElement('a');
-    a.href = `${apiUrl}/materials/${code}/${type}/${itemId}`;
-    a.download = `${itemId}`;
-    a.click();
+    window.open(downloadUrl, '_blank');
   };
   /******************************************************************/
   /* delete */
@@ -266,8 +266,7 @@ const CourseContent = React.memo(() => {
                           </td>
                         )}
                       <td>
-                        {(type === 'Books' ||
-                          file.materialName.includes('pdf')) && (
+                        {type === 'Books' && (
                           <img
                             src={Eye}
                             onClick={() => {
@@ -275,15 +274,14 @@ const CourseContent = React.memo(() => {
                             }}
                           />
                         )}
-                        {type !== 'Books' &&
-                          !file.materialName.includes('pdf') && (
-                            <img
-                              src={Download}
-                              onClick={() => {
-                                downloadHandler(file.materialName);
-                              }}
-                            />
-                          )}
+                        {type !== 'Books' && (
+                          <img
+                            src={Download}
+                            onClick={() => {
+                              downloadHandler(file.materialName);
+                            }}
+                          />
+                        )}
                         {role === 'DOCTOR' && role !== 'NOT' && (
                           <img
                             src={Delete}

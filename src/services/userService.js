@@ -378,10 +378,18 @@ export const forgetPasswordService = async (data) => {
       code: response.data.code,
     };
   } catch (error) {
-    return {
-      status: 'error',
-      message: error.response.data.message,
-    };
+    if (error.code === 'ERR_NETWORK') {
+      return {
+        status: 'error',
+        statusCode: error.code,
+        message: 'خطأ في الاتصال بالخادم',
+      };
+    } else {
+      return {
+        status: 'error',
+        message: error.response.data.message,
+      };
+    }
   }
 };
 /**********************************************/
@@ -398,9 +406,47 @@ export const resetPasswordService = async (data) => {
       status: 'success',
     };
   } catch (error) {
+    if (error.code === 'ERR_NETWORK') {
+      return {
+        status: 'error',
+        statusCode: error.code,
+        message: 'خطأ في الاتصال بالخادم',
+      };
+    } else {
+      return {
+        status: 'error',
+        message: error.response.data.message,
+      };
+    }
+  }
+};
+/**********************************************/
+/* Name: LogOut */
+/* Description: LogOut */
+/**********************************************/
+export const LogOutService = async () => {
+  const token = Cookies.get('token');
+  try {
+    const response = await axios.get(`${api_url}/api/v1/auth/logout`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return {
-      status: 'error',
-      message: error.response.data.message,
+      status: 'success',
     };
+  } catch (error) {
+    if (error.code === 'ERR_NETWORK') {
+      return {
+        status: 'error',
+        statusCode: error.code,
+        message: 'خطأ في الاتصال بالخادم',
+      };
+    } else {
+      return {
+        status: 'error',
+        message: error.response.data.message,
+      };
+    }
   }
 };

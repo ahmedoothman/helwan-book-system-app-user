@@ -95,7 +95,11 @@ const CourseContent = React.memo(() => {
       // check roleA
       if (type === 'Books') {
         if (roleA === 'DOCTOR') {
-          setFiles(response.bookStatus);
+          if (response.bookStatus) {
+            setFiles(response.bookStatus);
+          } else {
+            setFiles([]);
+          }
         } else {
           setFiles(response.data);
         }
@@ -297,7 +301,7 @@ const CourseContent = React.memo(() => {
               </tbody>
             </table>
           )}
-          {files.length === 0 && <Message text={'لا يوجد ملفات'} />}
+          {files.length === 0 && <Message text={'لا يوجد ملفات'} type='info' />}
           {courseContentStates.pending && (
             <Message text={'يتم تحميل الملفات'} type='load' />
           )}

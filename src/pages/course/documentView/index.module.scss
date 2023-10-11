@@ -1,11 +1,14 @@
 @import '../../../sass/main.scss';
 .document-container {
-  background-color: #fff;
+  background-color: $color-third-light;
+  padding: 0.5rem;
   border-radius: 1.5rem;
   overflow: hidden;
-  position: relative;
   //   style embeded
-  embed {
-    min-height: fit-content;
-  }
+  // embed {
+  //   min-height: fit-content;
+  // }
+  // img {
+  //   width: 100%;
+  // }
 }

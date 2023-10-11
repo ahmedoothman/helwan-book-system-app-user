@@ -231,25 +231,9 @@ const CourseContent = React.memo(() => {
                               file.adminStatus === 'accepted' && (
                                 <p>🟢 تم قبول الكتاب </p>
                               )}
-                            {file.publisherStatus === 'accepted' &&
-                              file.adminStatus !== 'accepted' && (
-                                <p>🟢 تم قبول الكتاب من هيئة النشر </p>
-                              )}
-                            {file.publisherStatus !== 'accepted' &&
-                              file.adminStatus === 'accepted' && (
-                                <p>🟢 تم قبول الكتاب من مسؤول الكلية </p>
-                              )}
                             {file.publisherStatus === 'pending' &&
                               file.adminStatus === 'pending' && (
                                 <p>🟡 جاري مراجعة الكتاب </p>
-                              )}
-                            {file.publisherStatus === 'pending' &&
-                              file.adminStatus !== 'pending' && (
-                                <p>🟡 جاري مراجعة الكتاب من هيئة النشر </p>
-                              )}
-                            {file.publisherStatus !== 'pending' &&
-                              file.adminStatus === 'pending' && (
-                                <p>🟡جاري مراجعة الكتاب من مسؤول الكلية </p>
                               )}
                             {file.publisherStatus === 'rejected' &&
                               file.adminStatus === 'rejected' && (
@@ -257,10 +241,25 @@ const CourseContent = React.memo(() => {
                                   🔴تم رفض الكتاب من هيئة النشر و مسؤول الكلية
                                 </p>
                               )}
-
+                            {file.publisherStatus === 'accepted' &&
+                              file.adminStatus !== 'accepted' && (
+                                <p>🟢 تم قبول الكتاب من هيئة النشر </p>
+                              )}
+                            {file.publisherStatus === 'pending' &&
+                              file.adminStatus !== 'pending' && (
+                                <p>🟡 جاري مراجعة الكتاب من هيئة النشر </p>
+                              )}
                             {file.publisherStatus === 'rejected' &&
                               file.adminStatus !== 'rejected' && (
                                 <p> 🔴تم رفض الكتاب من هيئة النشر</p>
+                              )}
+                            {file.publisherStatus !== 'accepted' &&
+                              file.adminStatus === 'accepted' && (
+                                <p>🟢 تم قبول الكتاب من مسؤول الكلية </p>
+                              )}
+                            {file.publisherStatus !== 'pending' &&
+                              file.adminStatus === 'pending' && (
+                                <p>🟡جاري مراجعة الكتاب من مسؤول الكلية </p>
                               )}
 
                             {file.publisherStatus !== 'rejected' &&

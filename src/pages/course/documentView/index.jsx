@@ -153,18 +153,18 @@ const DocumentView = React.memo(() => {
             e.preventDefault();
           }}
         >
-          {/* <embed
+          <embed
             src={pdfUrl}
             width='100%'
             height='1000'
             crossOrigin='anonymous'
-          /> */}
-          <ImageGallery
+          />
+          {/* <ImageGallery
             items={documentImagesState}
             showIndex={true}
             infinite={false}
             showFullscreenButton={false}
-          />
+          /> */}
         </div>
       </MainContainer>
 

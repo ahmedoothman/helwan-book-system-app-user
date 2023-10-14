@@ -40,19 +40,26 @@ const InfoBar = React.memo(() => {
   /* logOutHandler */
   /******************************************************************/
   const logOutHandler = async () => {
-    // remove session
-    Cookies.remove('token');
-    Cookies.remove('csrftoken');
-    Cookies.remove('studentID');
-    Cookies.remove('nationalID');
-
     // redirect to login page
     if (role === 'STUDENT') {
       const response = await LogOutService();
+
       if (response.status === 'success') {
+        // remove session
+        Cookies.remove('token');
+        Cookies.remove('csrftoken');
+        Cookies.remove('studentID');
+        Cookies.remove('nationalID');
         navigate('/');
+      } else {
+        console.log(response.message);
       }
     } else {
+      // remove session
+      Cookies.remove('token');
+      Cookies.remove('csrftoken');
+      Cookies.remove('studentID');
+      Cookies.remove('nationalID');
       navigate('/doctor/login');
     }
   };

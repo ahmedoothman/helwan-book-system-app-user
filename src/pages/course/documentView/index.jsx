@@ -7,11 +7,7 @@ import styles from './index.module.scss';
 import { MainContainer } from '../../../components/mainContainer';
 import { NavHeader } from '../../../components/navHeader';
 import { PathNavigate } from '../../../components/coursesItems/PathNavigate';
-import 'pdfjs-dist/build/pdf';
-import 'pdfjs-dist/build/pdf.worker.entry';
-//experiment
-import ImageGallery from 'react-image-gallery';
-import './image-gallery.scss';
+import { Message } from '../../../components/message';
 // reducer
 import {
   documentViewStatesInitialState,
@@ -43,9 +39,6 @@ const DocumentView = React.memo(() => {
     `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}`
   );
   const [role, setRole] = useState('NOT');
-  // documentImagesState
-  const [documentImagesState, setDocumentImagesState] = useState([]);
-
   // reducer
   const [documentViewStates, dispatchDocumentViewStates] = useReducer(
     documentViewStatesReducer,
@@ -59,79 +52,11 @@ const DocumentView = React.memo(() => {
     (async () => {
       const { role } = await getRoleService();
       setRole(role);
-
       const pdfUrlTemp = `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}`;
-      setPdfUrl(`${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}`);
-      // fetch pdf
-      fetchPdf(pdfUrlTemp);
+      setPdfUrl(pdfUrlTemp);
+      dispatchDocumentViewStates({ type: 'PENDING' });
     })();
   }, []);
-  /******************************************************************/
-  /* fetchPdf */
-  /******************************************************************/
-  const fetchPdf = async (url) => {
-    const pdfUrl = `${apiUrl}/api/v1/material/getBook/${code}/${token}/${itemId}`;
-
-    try {
-      const response = await fetch(pdfUrl);
-      const pdfBlob = await response.blob();
-      const pdfBlobUrl = URL.createObjectURL(pdfBlob);
-      await convertPdfToImages(pdfBlobUrl);
-    } catch (error) {
-      console.error('Error fetching PDF:', error);
-    }
-  };
-  /******************************************************************/
-  /* convert pdf to images */
-  /******************************************************************/
-  const convertPdfToImages = async (pdfUrl) => {
-    try {
-      const images = [];
-
-      // Load the PDF using pdfjs-dist library
-      const pdf = await window.pdfjsLib.getDocument(pdfUrl).promise;
-      const numPages = pdf.numPages;
-
-      for (let pageNumber = 1; pageNumber <= numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        const viewport = page.getViewport({ scale: 2 });
-
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport,
-        };
-
-        await page.render(renderContext).promise;
-
-        // Convert canvas to image
-        const image = new Image();
-        image.src = canvas.toDataURL('image/jpeg');
-
-        images.push({ pageNum: pageNumber, image });
-      }
-
-      // Sort the images based on page number
-      images.sort((a, b) => a.pageNum - b.pageNum);
-
-      // Update state with the sorted images
-      setDocumentImagesState((prevState) => [
-        ...images.map(({ image }) => ({
-          original: image.src,
-          thumbnail: image.src,
-        })),
-        ...prevState,
-      ]);
-    } catch (error) {
-      console.error('Error loading or rendering PDF:', error);
-    }
-  };
-
   /******************************************************************/
   /* handleCloseSnackbar */
   /******************************************************************/
@@ -153,18 +78,18 @@ const DocumentView = React.memo(() => {
             e.preventDefault();
           }}
         >
+          {documentViewStates.pending && (
+            <Message text={'جاري تحميل الملف'} type={'load'} />
+          )}
           <embed
             src={pdfUrl}
             width='100%'
             height='1000'
             crossOrigin='anonymous'
+            onLoad={() => {
+              dispatchDocumentViewStates({ type: 'CLEAR' });
+            }}
           />
-          {/* <ImageGallery
-            items={documentImagesState}
-            showIndex={true}
-            infinite={false}
-            showFullscreenButton={false}
-          /> */}
         </div>
       </MainContainer>
 

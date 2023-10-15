@@ -81,15 +81,19 @@ const InfoBar = React.memo(() => {
             <div>{`اهلا , ${info.name}`}</div>
           </div>
           <div className={styles['info-bar-container__part']}>
-            <div className={styles['info-item']}>
-              <span>الكلية: </span>
-              {info.faculty}
-            </div>
-            <div className={styles['info-item']}>
-              {' '}
-              <span>القسم: </span> {'حاسبات'}
-            </div>
-            {role !== 'NOT' && role === 'STUDENT' && (
+            {info.faculty && (
+              <div className={styles['info-item']}>
+                <span>الكلية: </span>
+                {info.faculty}
+              </div>
+            )}
+            {info.department && (
+              <div className={styles['info-item']}>
+                {' '}
+                <span>القسم: </span> {info.department}
+              </div>
+            )}
+            {role !== 'NOT' && role === 'STUDENT' && info.level && (
               <div className={styles['info-item']}>
                 {' '}
                 <span>الفرقة: </span> {info.level}

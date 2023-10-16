@@ -23,6 +23,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 // services
 import { doctorLoginService } from '../../../services/userService';
+// cookies
+import Cookies from 'js-cookie';
 /***************************************************************************/
 /* Name : LoginPage React Component */
 /***************************************************************************/
@@ -102,7 +104,14 @@ const LoginPage = React.memo(() => {
   /* useEffect */
   /******************************************************************/
   useEffect(() => {
-    (async () => {})();
+    (async () => {
+      const token = Cookies.get('token');
+      // check if user is already logged in
+      if (!!token) {
+        // redirect to home page
+        navigate('/course/courses');
+      }
+    })();
   }, []);
   // snackbar state
   const handleCloseSnackbar = () => {

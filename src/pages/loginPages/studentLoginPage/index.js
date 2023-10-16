@@ -106,7 +106,12 @@ const LoginStudentPage = React.memo(() => {
   /* useEffect */
   /******************************************************************/
   useEffect(() => {
-    (async () => {})();
+    (async () => {
+      const token = Cookies.get('token');
+      if (!!token) {
+        navigate('/course/courses');
+      }
+    })();
   }, []);
   // snackbar state
   const handleCloseSnackbar = () => {

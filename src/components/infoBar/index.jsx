@@ -89,13 +89,20 @@ const InfoBar = React.memo(() => {
       } else {
         console.log(response.message);
       }
-    } else {
+    } else if (role === 'DOCTOR') {
       // remove session
       Cookies.remove('token');
       Cookies.remove('csrftoken');
       Cookies.remove('studentID');
       Cookies.remove('nationalID');
       navigate('/doctor/login');
+    } else {
+      // remove session
+      Cookies.remove('token');
+      Cookies.remove('csrftoken');
+      Cookies.remove('studentID');
+      Cookies.remove('nationalID');
+      navigate('/');
     }
   };
   /******************************************************************/

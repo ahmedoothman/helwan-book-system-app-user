@@ -15,13 +15,23 @@ import {
   getMeService,
   LogOutService,
 } from '../../services/userService';
+// mui
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 /***************************************************************************/
 /* Name : InfoBar React Component */
 /***************************************************************************/
 const InfoBar = React.memo(() => {
   const navigate = useNavigate();
   const [role, setRole] = React.useState('NOT');
-  const [info, setInfo] = React.useState({});
+  const [errorState, setErrorState] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [info, setInfo] = React.useState({
+    name: '',
+    faculty: '',
+    department: '',
+    level: '',
+  });
   /******************************************************************/
   /* useEffect */
   /******************************************************************/
@@ -31,11 +41,36 @@ const InfoBar = React.memo(() => {
       const { role } = await getRoleService();
       setRole(role);
       // get info
-      const { info } = await getMeService();
-      setInfo(info);
+      await getMeHandler();
     })();
   }, []);
-
+  /******************************************************************/
+  /* handleCloseSnackbar */
+  /******************************************************************/
+  const handleCloseSnackbar = () => {
+    setErrorState(false);
+  };
+  /******************************************************************/
+  /* getMeHandler */
+  /******************************************************************/
+  const getMeHandler = async () => {
+    const response = await getMeService();
+    if (response.status === 'success') {
+      setInfo(response.info);
+    } else {
+      // show error message
+      setErrorState(true);
+      setErrorMessage(response.message + '|\n جاري تحويلك لصفحة تسجيل الدخول');
+      setTimeout(() => {
+        // redirect to login page
+        Cookies.remove('token');
+        Cookies.remove('csrftoken');
+        Cookies.remove('studentID');
+        Cookies.remove('nationalID');
+        navigate('/');
+      }, 3000);
+    }
+  };
   /******************************************************************/
   /* logOutHandler */
   /******************************************************************/
@@ -124,6 +159,33 @@ const InfoBar = React.memo(() => {
           </div>
         </div>
       </div>
+      {/* ********** ERROR SNACKBAR ********** */}
+      <Snackbar
+        open={errorState}
+        onClose={handleCloseSnackbar}
+        autoHideDuration={20000}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+      >
+        <Alert
+          severity='error'
+          onClose={handleCloseSnackbar}
+          dir='ltr'
+          sx={{
+            width: '100%',
+            backgroundColor: '#D32F2F',
+            color: '#fff',
+            fontSize: '1.4rem',
+            '& .MuiAlert-icon': {
+              color: '#fff',
+            },
+          }}
+        >
+          !{errorMessage}
+        </Alert>
+      </Snackbar>
     </Fragment>
   );
 });

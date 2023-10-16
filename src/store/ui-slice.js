@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 // cookies
 import Cookies from 'js-cookie';
 const initialState = {
-  api_url: 'http://127.0.0.1:9000',
+  api_url: 'http://192.168.137.223:9000',
   copyrights:
     'جميع الحقوق محفوظه لمركز الاتصالات وتكنولوجيا المعلومات - جامعة حلوان © 2023',
 };
